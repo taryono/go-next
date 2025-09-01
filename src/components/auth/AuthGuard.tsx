@@ -15,7 +15,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
     // Public routes yang tidak perlu authentication
     const publicRoutes = ['/signin', '/signup', '/error-404']
-    const isPublicRoute = publicRoutes.includes(pathname)
+    const isPublicRoute = publicRoutes.includes(pathname??"")
 
     useEffect(() => {
         // Set loading false setelah hydration

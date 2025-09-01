@@ -11,8 +11,7 @@ export default function AdminLayoutOld({
 }: {
   children: React.ReactNode;
 }) {
-  const { isExpanded, isHovered, isMobileOpen } = useSidebar();
-
+  const { isExpanded, isHovered, isMobileOpen, sidebarOpen } = useSidebar();
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
     ? "ml-0"
@@ -30,7 +29,7 @@ export default function AdminLayoutOld({
         className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
       >
         {/* Header */}
-        <AppHeader />
+        <AppHeader sidebarOpen={sidebarOpen} />
         {/* Page Content */}
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
       </div>
