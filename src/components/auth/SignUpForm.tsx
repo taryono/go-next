@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState } from "react";
-import { RegisterRequest } from "@/types/auth";
+import { RegisterRequest,RegisterResponse } from "@/types/auth";
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export default function SignUpForm() {
     e.preventDefault();
     setLocalError("");
     clearError();
-
+    
     // Validasi client-side
     if (!email || !password || !first_name || !last_name || !username) {
       setLocalError("Please fill in all fields");
@@ -54,9 +54,8 @@ export default function SignUpForm() {
 
     if (result.success) {
       router.push("/");
-    } else {
-      console.log(result);
-      setLocalError("Daftar Gagal, silahkan coba lagi");
+    } else {       
+      setLocalError(result.error??"Daftar Gagal, silahkan coba lagi");
     }
   };
 

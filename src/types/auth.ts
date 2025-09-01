@@ -30,5 +30,6 @@ export interface RegisterResponse {
   token: string;
   refreshToken?: string; // ✅ Tambah ini jika pakai dual token
   user: User;
+  status:string;
   message: string;
 }
