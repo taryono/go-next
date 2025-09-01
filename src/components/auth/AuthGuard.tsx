@@ -19,36 +19,22 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
     useEffect(() => {
         // Set loading false setelah hydration
-        setLoading(false)
-
+        // setLoading(false) 
         // Redirect logic
-        if (!isLoading) {
+        // if (!isLoading) {
             if (!isAuthenticated && !isPublicRoute) {
                 // User belum login dan mengakses protected route
                 router.push('/signin')
             } else if (isAuthenticated && (pathname === '/signin' || pathname === '/signup')) {
                 // User sudah login tapi mengakses login/signup page
                 router.push('/')
+            }else{
+                // User sudah login dan mengakses halaman yang diizinkan
             }
-        }
+        // }
     }, [isAuthenticated, isLoading, pathname, router, setLoading, isPublicRoute])
 
-    // Show loading spinner saat checking authentication
-    if (isLoading) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            </div>
-        )
-    }
-
-    // Render children jika sudah authenticated atau di public route
-    if (isAuthenticated || isPublicRoute) {
-        return <>{children}</>
-    }
-
-    // Return null saat redirecting
-    return null
+    return <>{children}</> 
 }
 
 export default AuthGuard

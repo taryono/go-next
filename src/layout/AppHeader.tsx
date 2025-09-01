@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import Link from 'next/link' 
+import { useSidebar } from "../context/SidebarContext";
+import { Menu } from 'lucide-react'
 
-const AppHeader = () => {
+const AppHeader = ({ sidebarOpen }: { sidebarOpen: boolean }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const { user, logout } = useAuthStore()
-  const router = useRouter()
-
+  const router = useRouter() 
   const handleLogout = () => {
     logout()
     router.push('/signin')
@@ -17,6 +18,7 @@ const AppHeader = () => {
 
   return (
     <header className="bg-white shadow-sm dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Search Bar */}
         <div className="flex flex-1 items-center">
@@ -30,7 +32,7 @@ const AppHeader = () => {
               <input
                 type="text"
                 placeholder="Search or type command..."
-                className="block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                className={`${sidebarOpen ? 'ml-64' : 'ml-20'} block w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                 <kbd className="inline-flex items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400 dark:border-gray-600">

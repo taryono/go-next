@@ -24,13 +24,14 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use((response) => {
     return response;
 }, (error) => {
+     
     if (error.response && error.response.status === 401) {
 
         // refresh token logic here if needed   
         
         // Handle unauthorized access, e.g., redirect to login page
         useAuthStore.getState().logout();
-        window.location.href = "/auth/login"; // Redirect to login page
+        //window.location.href = "/auth/login"; // Redirect to login page
     }
     return Promise.reject(error);
 });

@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 import {api} from '@/lib/api';
 import type { User, RegisterRequest, LoginRequest, AuthResponse, RegisterResponse } from '@/types/auth';
- 
+import { withLoading } from '@/utils/withLoading'
 
 interface AuthState {
     user: User | null;
@@ -34,87 +34,59 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             error: null,    
-            login: async (credentials :LoginRequest) => {
-                set({ isLoading: true, error: null })
+            login: async (credentials) =>
+                withLoading(set, async () => {
+                    try {
+                        // Simulasi API call dengan berbagai skenario error
+                        await new Promise(resolve => setTimeout(resolve, 1000))
 
-                try {
-                    // Simulasi API call dengan berbagai skenario error
-                    await new Promise(resolve => setTimeout(resolve, 1000))
-
-                    // Validasi email format
-                    if (!credentials.email.includes('@')) {
-                        set({ isLoading: false, error: 'Please enter a valid email address' })
-                        return { success: false, error: 'Please enter a valid email address' }
-                    }
-
-                    // Validasi password length
-                    if (credentials.password.length < 6) {
-                        set({ isLoading: false, error: 'Password must be at least 6 characters long' })
-                        return { success: false, error: 'Password must be at least 6 characters long' }
-                    } 
-
-                    // Login berhasil
-                    const response = await api.post<AuthResponse>('/api/auth/login', credentials);
-                    const { token, user, refreshToken } = response.data;
-                    if (!response.data.token) {
-                        // Handle invalid login response
-                        // NextResponse.redirect('/');
-                        // Credentials salah
-                        set({
-                            isLoading: false,
-                            error: 'Invalid email or password. Please check your credentials and try again.'
-                        })
-                        return {
-                            success: false,
-                            error: 'Invalid email or password. Please check your credentials and try again.'
+                        // Validasi email format
+                        if (!credentials.email.includes('@')) {
+                            set({ isLoading: false, error: 'Please enter a valid email address' })
+                            return { success: false, error: 'Please enter a valid email address' }
                         }
-                    }else{
+
+                        // Validasi password length
+                        if (credentials.password.length < 6) {
+                            set({ isLoading: false, error: 'Password must be at least 6 characters long' })
+                            return { success: false, error: 'Password must be at least 6 characters long' }
+                        } 
+
+                        const response = await api.post<AuthResponse>('/api/auth/login', credentials)
+                        const { token, user, refreshToken } = response.data
+                        if (!token || !user) {
+                            set({ error: 'Invalid credentials' })
+                            return { success: false, error: 'Invalid credentials' }
+                        }
                         set({
-                            user: user,
-                            token: token,
-                            refreshToken: refreshToken,
+                            user,
+                            token,
+                            refreshToken,
                             isAuthenticated: true,
-                            isLoading: false,
-                            error: null
-                        });
+                            error: null,
+                        })
                         return { success: true }
+                    } catch (err) {
+                        set({ error: 'Login failed' })
+                        return { success: false, error: 'Login failed' }
                     }
-                     
-                } catch (error) {
-                    const errorMessage = 'Network error. Please check your internet connection and try again.'
-                    set({ isLoading: false, error: errorMessage })
-                    return { success: false, error: errorMessage }
-                }
-            }, 
-            register: async (userData: RegisterRequest) => {
-                set({isLoading: true, error: null});
-                try {
-                    const response = await api.post<RegisterResponse>('/api/auth/register', userData);
-                    const {token, user} = response.data;
-                    if(!response.data.token) {
-                        set({
-                            error: response.data.message || 'Registration failed',
-                            isLoading: false
-                        });
-                        return { success: false, error: response.data.message || 'Registration failed' };
-                    }else{
-                        set({
-                            user: user,
-                            token: token,
-                            isAuthenticated: true,
-                            isLoading: false,
-                            error: null
-                        });
-                        return { success: true, error: undefined };
+                }),
+            register: async (userData) =>
+                withLoading(set, async () => {
+                    try {
+                        const response = await api.post<RegisterResponse>('/api/auth/register', userData)
+                        const { token, user } = response.data
+                        if (!token) {
+                            set({ error: 'Registration failed' })
+                            return { success: false, error: 'Registration failed' }
+                        }
+                        set({ user, token, isAuthenticated: true, error: null })
+                        return { success: true }
+                    } catch (err) {
+                        set({ error: 'Registration failed' })
+                        return { success: false, error: 'Registration failed' }
                     }
-                } catch (error: any) {
-                    set({
-                        error: error.response?.data?.message || 'Registration failed',
-                        isLoading: false
-                    });
-                    return { success: false, error: error.response?.data?.message || 'Registration failed' };
-                }
-            },
+                }),
             logout: () => {
                 localStorage.removeItem('token');
                 set({
